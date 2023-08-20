@@ -30,4 +30,3 @@ jobs:
           goversion: "https://go.dev/dl/go1.20.linux-amd64.tar.gz"
           project_path: "./proxy"
           binary_name: "WProxy"
-          extra_files: README.md
