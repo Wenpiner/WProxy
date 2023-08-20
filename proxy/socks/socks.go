@@ -88,7 +88,7 @@ func (s *Socks) handlerAuth() error {
 				auth = true
 			}
 		}
-		if auth {
+		if !auth {
 			return errors.New("username/password auth not support")
 		}
 		// 选择用户名密码认证方式
