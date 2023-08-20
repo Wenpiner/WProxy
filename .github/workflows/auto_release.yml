@@ -26,4 +26,5 @@ jobs:
           version: latest
           args: release --rm-dist
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.A_GITHUB_TOKEN }}
+          # Failed to add secret. Secret names must not start with GITHUB_.
