@@ -106,7 +106,7 @@ func (s *Socks) handlerAuth() error {
 			return errors.New("unknown socks auth version")
 		}
 		// 用户名长度
-		usernameLen := make([]byte, 4)
+		usernameLen := make([]byte, 1)
 		_, err = s.Conn.Read(usernameLen)
 		if err != nil {
 			return err
@@ -118,7 +118,7 @@ func (s *Socks) handlerAuth() error {
 			return err
 		}
 		// 密码长度
-		passwordLen := make([]byte, 4)
+		passwordLen := make([]byte, 1)
 		_, err = s.Conn.Read(passwordLen)
 		if err != nil {
 			return err
@@ -129,9 +129,11 @@ func (s *Socks) handlerAuth() error {
 		if err != nil {
 			return err
 		}
+		usernameStr := string(username)
+		passwordStr := string(password)
 		s2, _ := s.UserInfo.Password()
 		// 验证用户名密码
-		if s.UserInfo.Username() != string(username) || s2 != string(password) {
+		if s.UserInfo.Username() != usernameStr || s2 != passwordStr {
 			// 验证失败
 			_, err = s.Conn.Write([]byte{0x01, 0x01})
 			if err != nil {
