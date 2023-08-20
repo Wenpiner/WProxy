@@ -29,5 +29,5 @@ jobs:
           goarch: ${{ matrix.goarch }}
           goversion: "https://go.dev/dl/go1.20.linux-amd64.tar.gz"
           project_path: "./proxy"
-          binary_name: "test-binary"
-          extra_files: LICENSE README.md
+          binary_name: "WProxy"
+          extra_files: README.md
