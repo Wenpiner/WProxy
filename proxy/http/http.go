@@ -35,6 +35,9 @@ func (httpConn *HttpConn) Read(b []byte) (n int, err error) {
 func (httpConn *HttpConn) Handshake() error {
 	reqBufReader := bufio.NewReader(io.NopCloser(httpConn.Conn))
 	req, err := http.ReadRequest(reqBufReader)
+	if err != nil {
+		return err
+	}
 	if httpConn.UserInfo != nil {
 		get := req.Header.Get("Proxy-Authorization")
 		// 解析密码
