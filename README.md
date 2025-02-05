@@ -37,3 +37,8 @@ WProxy 是一个带鉴权的 SOCKS5 和 HTTP 代理,支持端口复用的工具�
 # 许可证
 
 WProxy 基于 MIT 许可证发布,您可以自由使用、修改和分发本项目。
+
+
+## Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=Wenpiner/WProxy&type=Date)](https://star-history.com/#Wenpiner/WProxy&Date)
