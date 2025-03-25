@@ -12,21 +12,17 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        # build and publish in parallel: linux/386, linux/amd64, linux/arm64, windows/386, windows/amd64, darwin/amd64, darwin/arm64, linux/x86_64
+        # build and publish in parallel: linux/386, linux/amd64, linux/arm64, windows/386, windows/amd64, darwin/amd64, darwin/arm64
         goos: [linux, windows, darwin]
-        goarch: ["386", amd64, arm64, x86_64]
+        goarch: ["386", amd64, arm64, arm]
         exclude:
           - goarch: "386"
             goos: darwin
-          - goarch: arm64
-            goos: windows
-          - goarch: x86_64
-            goos: windows
-          - goarch: x86_64
+          - goarch: "arm"
             goos: darwin
     steps:
       - uses: actions/checkout@v3
-      - uses: wangyoucao577/go-release-action@v1
+      - uses: wangyoucao577/go-release-action@v1.53
         with:
           github_token: ${{ secrets.A_GITHUB_TOKEN }}
           goos: ${{ matrix.goos }}
