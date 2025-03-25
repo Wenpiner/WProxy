@@ -148,7 +148,7 @@ func (s *Socks) handlerAuth() error {
 			}
 		}
 	} else {
-		log.Println("no auth")
+		log.Println("No authentication")
 		// 选择无需认证方式
 		_, err = s.Conn.Write([]byte{0x05, 0x00})
 		if err != nil {

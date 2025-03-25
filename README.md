@@ -1,43 +1,116 @@
 # WProxy
 
-WProxy 是一个带鉴权的 SOCKS5 和 HTTP 代理,支持端口复用的工具。它可以帮助您在安全和高效的环境下上网。
+WProxy is an authenticated SOCKS5 and HTTP proxy tool with port multiplexing support. It helps you access the internet in a secure and efficient environment.
 
-# 特性
+[中文文档](README_zh-CN.md) | [English](README.md)
 
-- [x] 支持身份验证,可以防止未经授权的访问
-- [x] 支持端口复用,可以复用同一个端口提供多种代理服务
-- [x] 轻量级和跨平台,可在 Windows、Linux 和 macOS 上运行
-- [x] 支持 SOCKS5 和 HTTP 代理协议
+# Features
 
-# 安装
+- [x] Authentication support to prevent unauthorized access
+- [x] Port multiplexing to provide multiple proxy services on the same port
+- [x] Lightweight and cross-platform, runs on Windows, Linux, and macOS
+- [x] Supports SOCKS5 and HTTP proxy protocols
 
-您可以通过以下步骤安装 WProxy:
+# Quick Installation
 
-- 从 GitHub 仓库下载最新版本的 WProxy 二进制文件。
-- 将下载的文件解压缩到您的系统中。
-- 在命令行中运行 ./wproxy 命令启动代理服务器。
+## One-Click Installation for Linux
 
-# 配置
+Use the following command to quickly install WProxy:
 
-您可以根据需要进行以下设置:
+```bash
+curl -s https://raw.githubusercontent.com/Wenpiner/WProxy/main/install.sh | sudo bash
+```
 
-- listen_addr: 代理服务器的监听地址,默认为 0.0.0.0:1080。
-- username 和 password: 身份验证所需的用户名和密码。
+The installation script will automatically:
+1. Detect system architecture (supports amd64 and arm64)
+2. Download the latest version from GitHub
+3. Install to system directory
+4. Create configuration file
+5. Set up system service (auto-start on boot)
 
-# 使用
+After installation, you can check the service status with:
+```bash
+systemctl status wproxy
+```
 
-- 将您的应用程序或浏览器配置为使用 WProxy 作为代理服务器。
-- 输入代理服务器的地址和端口,以及身份验证所需的用户名和密码(如果已启用)。
-- 开始通过代理服务器访问互联网。
+## Uninstallation
 
-# 贡献
+Use the following command to quickly uninstall WProxy:
 
-如果您发现任何问题或有任何改进建议,欢迎提交 issue 或 pull request。我们很高兴能与社区一起改进 WProxy。
+```bash
+curl -s https://raw.githubusercontent.com/Wenpiner/WProxy/main/uninstall.sh | sudo bash
+```
 
-# 许可证
+The uninstallation script will automatically:
+1. Stop and disable WProxy service
+2. Remove system service file
+3. Remove program files
+4. Remove configuration files
 
-WProxy 基于 MIT 许可证发布,您可以自由使用、修改和分发本项目。
+## Manual Installation
 
+If you prefer manual installation, follow these steps:
+
+1. Download the latest WProxy binary from GitHub repository
+2. Extract the downloaded file to your system
+3. Run `./wproxy` command to start the proxy server
+
+# Configuration
+
+The configuration file is located at `/etc/wproxy/config.yaml`. You can configure the following settings:
+
+- listen_addr: Proxy server listening address, default is 0.0.0.0:1080
+- username and password: Authentication credentials
+
+Default configuration:
+```yaml
+listen_addr: "0.0.0.0:1080"
+username: "admin"
+password: "16-digit random password"  # Generated during installation
+```
+
+Notes:
+1. A random 16-digit password is generated during installation
+2. The generated password will be displayed after installation, please keep it safe
+3. To change the password, edit the config file and restart the service
+
+# Usage
+
+- Configure your applications or browsers to use WProxy as the proxy server
+- Enter the proxy server address, port, and authentication credentials (if enabled)
+- Start accessing the internet through the proxy server
+
+# Service Management
+
+After installation, you can manage the WProxy service using these commands:
+
+```bash
+# Start service
+sudo systemctl start wproxy
+
+# Stop service
+sudo systemctl stop wproxy
+
+# Restart service
+sudo systemctl restart wproxy
+
+# Check service status
+sudo systemctl status wproxy
+
+# Enable auto-start
+sudo systemctl enable wproxy
+
+# Disable auto-start
+sudo systemctl disable wproxy
+```
+
+# Contributing
+
+If you find any issues or have suggestions for improvements, feel free to submit issues or pull requests. We welcome community contributions to improve WProxy.
+
+# License
+
+WProxy is released under the MIT License. You are free to use, modify, and distribute this project.
 
 ## Star History
 

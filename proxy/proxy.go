@@ -22,26 +22,26 @@ func main() {
 		Port: *port,
 	})
 	if err != nil {
-		log.Fatalln("启动TCP代理失败:", err)
+		log.Fatalln("Failed to start TCP proxy:", err)
 		return
 	}
 	var urlinfo *url.Userinfo
 	if *username != "" && *password != "" {
-		fmt.Println("启动TCP代理成功，账号密码:", *username, *password)
+		fmt.Println("TCP proxy started successfully with credentials:", *username, *password)
 		urlinfo = url.UserPassword(*username, *password)
 	} else {
-		fmt.Println("启动TCP代理成功，无账号密码")
+		fmt.Println("TCP proxy started successfully without credentials")
 	}
 
 	handlerTcp(*listen, urlinfo)
-	// TODO 实现UDP代理
+	// TODO: Implement UDP proxy
 }
 
 func handlerConn(tcp *net.TCPConn, userinfo *url.Userinfo) {
 	defer func(tcp *net.TCPConn) {
 		err := tcp.Close()
 		if err != nil {
-			log.Println("tcp close error:", err)
+			log.Println("TCP close error:", err)
 		}
 	}(tcp)
 	// Switch Proxy
@@ -57,7 +57,7 @@ func handlerConn(tcp *net.TCPConn, userinfo *url.Userinfo) {
 		return
 	}
 	if err != nil {
-		log.Printf("connection to %v  failed to detect proxy protocol type:%v\n", tcp.RemoteAddr().String(), err)
+		log.Printf("Connection to %v failed to detect proxy protocol type: %v\n", tcp.RemoteAddr().String(), err)
 		return
 	}
 	conn.Stop()
@@ -68,7 +68,7 @@ func handlerConn(tcp *net.TCPConn, userinfo *url.Userinfo) {
 		}
 		err = s.Handshake()
 		if err != nil {
-			log.Printf("socks handshake error:%v\n", err)
+			log.Printf("SOCKS handshake error: %v\n", err)
 			return
 		}
 	} else {
@@ -78,7 +78,7 @@ func handlerConn(tcp *net.TCPConn, userinfo *url.Userinfo) {
 		}
 		err = h.Handshake()
 		if err != nil {
-			log.Printf("http handshake error:%v\n", err)
+			log.Printf("HTTP handshake error: %v\n", err)
 			return
 		}
 	}

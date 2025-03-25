@@ -14,18 +14,18 @@ func TestSocks(t *testing.T) {
 		return
 	}
 
-	// 使用代理 Dialer 创建 HTTP 客户端
+	// Create HTTP client with proxy dialer
 	httpTransport := &http.Transport{Dial: dialer.Dial}
 	httpClient := &http.Client{Transport: httpTransport}
 
-	// 创建 HTTP 请求
+	// Create HTTP request
 	req, err := http.NewRequest("GET", "https://www.baidu.com", nil)
 	if err != nil {
 		fmt.Println("Error creating request:", err)
 		return
 	}
 
-	// 发送请求
+	// Send request
 	resp, err := httpClient.Do(req)
 	if err != nil {
 		fmt.Println("Error sending request:", err)
@@ -33,7 +33,7 @@ func TestSocks(t *testing.T) {
 	}
 	defer resp.Body.Close()
 
-	// 处理响应
+	// Handle response
 	fmt.Println("Response status:", resp.Status)
-	// 在这里可以处理响应内容等
+	// Process response content here
 }

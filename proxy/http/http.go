@@ -58,7 +58,7 @@ func (httpConn *HttpConn) Handshake() error {
 	}
 
 	if err != nil {
-		log.Println("not a valid http request")
+		log.Println("Not a valid HTTP request")
 		return err
 	}
 	// 解析主机名
