@@ -44,46 +44,56 @@ if [ -z "$LATEST_VERSION" ]; then
     exit 1
 fi
 
+# 获取当前平台
+# 获取当前操作系统平台
+OS=$(uname -s | tr '[:upper:]' '[:lower:]')
+case $OS in
+    linux)
+        ;;
+    darwin)
+        ;;
+    *)
+        echo -e "${RED}当前仅支持 Linux 和 macOS 平台${NC}"
+        exit 1
+        ;;
+esac
 
 echo "Downloading WProxy $LATEST_VERSION..."
-DOWNLOAD_URL="https://github.com/Wenpiner/WProxy/releases/download/$LATEST_VERSION/WProxy-$LATEST_VERSION-linux-$ARCH.tar.gz"
+# 显示系统信息用于调试
+echo "System Info:"
+echo "- OS: $OS"
+echo "- Architecture: $ARCH"
 
-# Use wget to download file and capture progress information
-wget --progress=bar:force:noscroll $DOWNLOAD_URL -O /tmp/WProxy.tar.gz 2>&1 | while read -r line; do
-    # Extract progress percentage
-    progress=$(echo "$line" | grep -oP "(\d+)(?=%)")
-    if [ -n "$progress" ]; then
-        # Extract download speed and remaining time
-        speed=$(echo "$line" | grep -oP "(\d+\.\d+ [KM]?B/s)")
-        eta=$(echo "$line" | grep -oP "ETA \d+:\d+")
+DOWNLOAD_URL="https://github.com/Wenpiner/WProxy/releases/download/$LATEST_VERSION/WProxy_${OS}_${ARCH}.tar.gz"
+echo "Download URL: $DOWNLOAD_URL"
 
-        # Calculate progress bar length
-        bar_length=$((progress / 2))
-        bar=$(printf '#%.0s' $(seq 1 $bar_length))
-        spaces=$(printf ' %.0s' $(seq 1 $((50 - bar_length))))
+# 使用 curl 替代 wget，提供更好的错误处理
+echo "Downloading..."
+if ! curl -L --fail "$DOWNLOAD_URL" -o /tmp/WProxy.tar.gz; then
+    echo -e "${RED}Download failed. Please check the URL and try again.${NC}"
+    exit 1
+fi
 
-        # Use tput to control cursor position
-        tput sc
-        tput el
-        printf "Progress: [%s%s] %d%% %s %s\n" "$bar" "$spaces" "$progress" "$speed" "$eta"
-        tput rc
-    fi
-done
-
-# Show 100% progress after download completion
-tput sc
-tput el
-printf "Progress: [%s] %d%%\n" "$(printf '#%.0s' $(seq 1 50))" 100
-tput rc
-
-if [ $? -ne 0 ]; then
-    echo -e "${RED}Download failed${NC}"
+# 验证下载文件是否存在且大小不为0
+if [ ! -s /tmp/WProxy.tar.gz ]; then
+    echo -e "${RED}Downloaded file is empty or does not exist${NC}"
     exit 1
 fi
 
 # Extract files
 echo "Extracting files..."
-tar -xzf /tmp/WProxy.tar.gz -C /tmp
+tar -xzvf /tmp/WProxy.tar.gz -C /tmp
+
+if [ $? -ne 0 ]; then
+    echo -e "${RED}Extraction failed${NC}"
+    exit 1
+fi
+
+# 验证解压后的文件是否存在
+if [ ! -f /tmp/WProxy ]; then
+    echo -e "${RED}Extracted binary not found${NC}"
+    exit 1
+fi
 
 # Move binary to system directory
 echo "Installing..."
