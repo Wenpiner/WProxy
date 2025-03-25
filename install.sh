@@ -44,13 +44,37 @@ if [ -z "$LATEST_VERSION" ]; then
     exit 1
 fi
 
+
 echo "Downloading WProxy $LATEST_VERSION..."
 DOWNLOAD_URL="https://github.com/Wenpiner/WProxy/releases/download/$LATEST_VERSION/WProxy-$LATEST_VERSION-linux-$ARCH.tar.gz"
-wget --progress=bar:force:noscroll $DOWNLOAD_URL -O /tmp/WProxy.tar.gz 2>&1 | \
-    grep --line-buffered -oP "(\d+)(?=%)"|while read -r progress; do 
-        echo -ne "\033[K\rProgress: [%-50s] %d%%" "$(printf '#%.0s' $(seq 1 $((progress/2))))" "$progress"
-    done
-echo -ne "\033[K\rProgress: [%-50s] %d%%\n" "$(printf '#%.0s' $(seq 1 50))" "100"
+
+# Use wget to download file and capture progress information
+wget --progress=bar:force:noscroll $DOWNLOAD_URL -O /tmp/WProxy.tar.gz 2>&1 | while read -r line; do
+    # Extract progress percentage
+    progress=$(echo "$line" | grep -oP "(\d+)(?=%)")
+    if [ -n "$progress" ]; then
+        # Extract download speed and remaining time
+        speed=$(echo "$line" | grep -oP "(\d+\.\d+ [KM]?B/s)")
+        eta=$(echo "$line" | grep -oP "ETA \d+:\d+")
+
+        # Calculate progress bar length
+        bar_length=$((progress / 2))
+        bar=$(printf '#%.0s' $(seq 1 $bar_length))
+        spaces=$(printf ' %.0s' $(seq 1 $((50 - bar_length))))
+
+        # Use tput to control cursor position
+        tput sc
+        tput el
+        printf "Progress: [%s%s] %d%% %s %s\n" "$bar" "$spaces" "$progress" "$speed" "$eta"
+        tput rc
+    fi
+done
+
+# Show 100% progress after download completion
+tput sc
+tput el
+printf "Progress: [%s] %d%%\n" "$(printf '#%.0s' $(seq 1 50))" 100
+tput rc
 
 if [ $? -ne 0 ]; then
     echo -e "${RED}Download failed${NC}"
