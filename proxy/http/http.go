@@ -40,7 +40,7 @@ func (httpConn *HttpConn) Handshake() error {
 	}
 	if httpConn.UserInfo != nil {
 		get := req.Header.Get("Proxy-Authorization")
-		// 解析密码
+		// Parse password
 		user, password, ok := parseBasicAuth(get)
 		if !ok {
 			return errors.New("parse password error")
@@ -61,13 +61,17 @@ func (httpConn *HttpConn) Handshake() error {
 		log.Println("Not a valid HTTP request")
 		return err
 	}
-	// 解析主机名
-	host, port, err := parseHostAndPort(req.Host)
-	if err != nil {
-		fmt.Println("Error:", err)
-		return err
+	// Parse hostname
+	host := req.URL.Hostname()
+	port := req.URL.Port()
+	if port == "" {
+		port = "80"
+		if req.URL.Scheme == "https" {
+			port = "443"
+		}
 	}
-	// 打印解析得到的域名和端口
+	// Print parsed domain and port
+	fmt.Println("Domain:", host, "Port:", port)
 	dial, err := net.Dial("tcp", fmt.Sprintf("%s:%s", host, port))
 	if err != nil {
 		return err
@@ -97,7 +101,7 @@ func parseHostAndPort(hostPort string) (string, string, error) {
 		return "", "", err
 	}
 
-	// 使用 Hostname() 和 Port() 获取域名和端口
+	// Get domain and port using Hostname() and Port()
 	host := parsedURL.Hostname()
 	port := parsedURL.Port()
 

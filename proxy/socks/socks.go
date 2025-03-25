@@ -17,31 +17,40 @@ type Socks struct {
 }
 
 type TargetAddr struct {
-	Name    string // 域名
-	IP      net.IP // IP
-	Port    int    // 端口
-	Command byte   // 命令
-	Type    byte   // 类型
+	Name    string // Domain name
+	IP      net.IP // IP address
+	Port    int    // Port
+	Command byte   // Command
+	Type    byte   // Type
+}
+
+type SocksRequest struct {
+	Version byte   // Version
+	Name    string // Domain name
+	IP      net.IP // IP address
+	Port    int    // Port
+	Command byte   // Command
+	Type    byte   // Type
 }
 
 func (s *Socks) Handshake() error {
-	// 处理 socks 版本
-	err := s.handlerVersion()
+	// Handle socks version
+	err := s.handleVersion()
 	if err != nil {
 		return err
 	}
-	// 选择认证方式
-	err = s.handlerAuth()
+	// Select authentication method
+	err = s.selectAuthMethod()
 	if err != nil {
 		return err
 	}
 
-	// 接收目标地址
-	targetAddr, err := s.handlerTargetAddr()
+	// Receive target address
+	targetAddr, err := s.receiveTargetAddress()
 	if err != nil {
 		return err
 	}
-	// 处理IP请求转发
+	// Handle IP request forwarding
 	if targetAddr.Command == 0x01 {
 		dial, err := net.Dial("tcp", fmt.Sprintf("%s:%d", targetAddr.IP.String(), targetAddr.Port))
 		if err != nil {
@@ -54,7 +63,8 @@ func (s *Socks) Handshake() error {
 	return nil
 }
 
-func (s *Socks) handlerVersion() error {
+// Handle socks version
+func (s *Socks) handleVersion() error {
 	verByte := [1]byte{}
 	_, err := s.Conn.Read(verByte[:])
 	if err != nil {
@@ -66,21 +76,22 @@ func (s *Socks) handlerVersion() error {
 	return nil
 }
 
-func (s *Socks) handlerAuth() error {
-	// 读取认证方式数量
+// Select authentication method
+func (s *Socks) selectAuthMethod() error {
+	// Read number of authentication methods
 	methodsByte := make([]byte, 1)
 	_, err := s.Conn.Read(methodsByte)
 	if err != nil {
 		return err
 	}
 	methodsLen := int(methodsByte[0])
-	// 读取认证方式
+	// Read authentication methods
 	methods := make([]byte, methodsLen)
 	_, err = s.Conn.Read(methods)
 	if err != nil {
 		return err
 	}
-	// 判断是否存在用户名密码的认证方式
+	// Check if username/password authentication method exists
 	if s.UserInfo != nil {
 		auth := false
 		for _, method := range methods {
@@ -91,12 +102,12 @@ func (s *Socks) handlerAuth() error {
 		if !auth {
 			return errors.New("username/password auth not support")
 		}
-		// 选择用户名密码认证方式
+		// Select username/password authentication method
 		_, err = s.Conn.Write([]byte{0x05, 0x02})
 		if err != nil {
 			return err
 		}
-		// 读取用户名密码认证结果
+		// Read username/password authentication result
 		authResult := make([]byte, 1)
 		_, err = s.Conn.Read(authResult)
 		if err != nil {
@@ -105,25 +116,25 @@ func (s *Socks) handlerAuth() error {
 		if authResult[0] != 0x01 {
 			return errors.New("unknown socks auth version")
 		}
-		// 用户名长度
+		// Read username length
 		usernameLen := make([]byte, 1)
 		_, err = s.Conn.Read(usernameLen)
 		if err != nil {
 			return err
 		}
-		// 用户名
+		// Read username
 		username := make([]byte, int(usernameLen[0]))
 		_, err = s.Conn.Read(username)
 		if err != nil {
 			return err
 		}
-		// 密码长度
+		// Read password length
 		passwordLen := make([]byte, 1)
 		_, err = s.Conn.Read(passwordLen)
 		if err != nil {
 			return err
 		}
-		// 密码
+		// Read password
 		password := make([]byte, int(passwordLen[0]))
 		_, err = s.Conn.Read(password)
 		if err != nil {
@@ -132,16 +143,16 @@ func (s *Socks) handlerAuth() error {
 		usernameStr := string(username)
 		passwordStr := string(password)
 		s2, _ := s.UserInfo.Password()
-		// 验证用户名密码
+		// Verify username/password
 		if s.UserInfo.Username() != usernameStr || s2 != passwordStr {
-			// 验证失败
+			// Verify failed
 			_, err = s.Conn.Write([]byte{0x01, 0x01})
 			if err != nil {
 				return err
 			}
 			return errors.New("username/password auth failed")
 		} else {
-			// 验证成功
+			// Verify succeeded
 			_, err = s.Conn.Write([]byte{0x01, 0x00})
 			if err != nil {
 				return err
@@ -149,7 +160,7 @@ func (s *Socks) handlerAuth() error {
 		}
 	} else {
 		log.Println("No authentication")
-		// 选择无需认证方式
+		// Select no authentication method
 		_, err = s.Conn.Write([]byte{0x05, 0x00})
 		if err != nil {
 			return err
@@ -158,15 +169,16 @@ func (s *Socks) handlerAuth() error {
 	return nil
 }
 
-func (s *Socks) handlerTargetAddr() (target TargetAddr, err error) {
+// Receive target address
+func (s *Socks) receiveTargetAddress() (target TargetAddr, err error) {
 	var ret []byte
-	// 读取请求头
+	// Read request header
 	header := [3]byte{}
 	_, err = s.Conn.Read(header[:])
 	if err != nil {
 		return
 	}
-	// 判断请求头是否正确
+	// Check if request header is correct
 	if header[0] != 0x05 {
 		err = errors.New(fmt.Sprintf("unknown socks version:%s", hex.EncodeToString(header[:])))
 		return
@@ -183,7 +195,7 @@ func (s *Socks) handlerTargetAddr() (target TargetAddr, err error) {
 		return
 	}
 	ret = append(ret, 0x00)
-	// 读取请求地址类型
+	// Read request address type
 	addrTypeByte := make([]byte, 1)
 	_, err = s.Conn.Read(addrTypeByte)
 	if err != nil {
@@ -202,7 +214,7 @@ func (s *Socks) handlerTargetAddr() (target TargetAddr, err error) {
 		target.IP = net.IPv4(addrByte[0], addrByte[1], addrByte[2], addrByte[3])
 		ret = append(ret, addrByte...)
 	case 0x03:
-		// 域名
+		// Domain name
 		addrLenByte := make([]byte, 1)
 		_, err = s.Conn.Read(addrLenByte)
 		if err != nil {
@@ -230,17 +242,17 @@ func (s *Socks) handlerTargetAddr() (target TargetAddr, err error) {
 		err = errors.New("unknown socks addr type")
 		return
 	}
-	// 读取请求端口
+	// Read request port
 	portByte := make([]byte, 2)
 	_, err = s.Conn.Read(portByte)
 	if err != nil {
 		return
 	}
 	ret = append(ret, portByte...)
-	// 使用内置函数转换成大端
+	// Use built-in function to convert to big endian
 	target.Port = int(binary.BigEndian.Uint16(portByte))
 
-	// 回复客户端连接成功
+	// Reply client connection success
 	_, err = s.Conn.Write(ret)
 	return
 }

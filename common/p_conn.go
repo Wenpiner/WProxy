@@ -56,10 +56,10 @@ func (buf *BufConn) Read(b []byte) (int, error) {
 		return read, err
 	} else {
 		dstLen := len(b)
-		// 判断需要读取的数据大小
+		// Check the size of data to be read
 		cacheLen := len(buf.buf)
 		if cacheLen > 0 {
-			// 如果还有缓存
+			// If there is cached data
 			if dstLen > len(buf.buf) {
 				i := copy(b, buf.buf)
 				buf.buf = buf.buf[:0]
