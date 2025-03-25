@@ -30,7 +30,7 @@ curl -s https://raw.githubusercontent.com/Wenpiner/WProxy/main/install.sh | sudo
 
 安装完成后，您可以通过以下命令查看服务状态：
 ```bash
-systemctl status wproxy
+systemctl status WProxy
 ```
 
 ## 卸载
@@ -53,11 +53,11 @@ curl -s https://raw.githubusercontent.com/Wenpiner/WProxy/main/uninstall.sh | su
 
 1. 从 GitHub 仓库下载最新版本的 WProxy 二进制文件
 2. 将下载的文件解压缩到您的系统中
-3. 在命令行中运行 `./wproxy` 命令启动代理服务器
+3. 在命令行中运行 `./WProxy` 命令启动代理服务器
 
 # 配置
 
-配置文件位于 `/etc/wproxy/config.yaml`，您可以根据需要进行以下设置：
+配置文件位于 `/etc/WProxy/config.yaml`，您可以根据需要进行以下设置：
 
 - listen_addr: 代理服务器的监听地址，默认为 0.0.0.0:1080
 - username 和 password: 身份验证所需的用户名和密码
@@ -86,22 +86,22 @@ password: "16位随机密码"  # 安装时自动生成
 
 ```bash
 # 启动服务
-sudo systemctl start wproxy
+sudo systemctl start WProxy
 
 # 停止服务
-sudo systemctl stop wproxy
+sudo systemctl stop WProxy
 
 # 重启服务
-sudo systemctl restart wproxy
+sudo systemctl restart WProxy
 
 # 查看服务状态
-sudo systemctl status wproxy
+sudo systemctl status WProxy
 
 # 设置开机自启
-sudo systemctl enable wproxy
+sudo systemctl enable WProxy
 
 # 禁用开机自启
-sudo systemctl disable wproxy
+sudo systemctl disable WProxy
 ```
 
 # 贡献

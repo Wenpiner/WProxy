@@ -30,7 +30,7 @@ The installation script will automatically:
 
 After installation, you can check the service status with:
 ```bash
-systemctl status wproxy
+systemctl status WProxy
 ```
 
 ## Uninstallation
@@ -53,11 +53,11 @@ If you prefer manual installation, follow these steps:
 
 1. Download the latest WProxy binary from GitHub repository
 2. Extract the downloaded file to your system
-3. Run `./wproxy` command to start the proxy server
+3. Run `./WProxy` command to start the proxy server
 
 # Configuration
 
-The configuration file is located at `/etc/wproxy/config.yaml`. You can configure the following settings:
+The configuration file is located at `/etc/WProxy/config.yaml`. You can configure the following settings:
 
 - listen_addr: Proxy server listening address, default is 0.0.0.0:1080
 - username and password: Authentication credentials
@@ -86,22 +86,22 @@ After installation, you can manage the WProxy service using these commands:
 
 ```bash
 # Start service
-sudo systemctl start wproxy
+sudo systemctl start WProxy
 
 # Stop service
-sudo systemctl stop wproxy
+sudo systemctl stop WProxy
 
 # Restart service
-sudo systemctl restart wproxy
+sudo systemctl restart WProxy
 
 # Check service status
-sudo systemctl status wproxy
+sudo systemctl status WProxy
 
 # Enable auto-start
-sudo systemctl enable wproxy
+sudo systemctl enable WProxy
 
 # Disable auto-start
-sudo systemctl disable wproxy
+sudo systemctl disable WProxy
 ```
 
 # Contributing
