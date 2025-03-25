@@ -46,7 +46,8 @@ fi
 
 echo "Downloading WProxy $LATEST_VERSION..."
 DOWNLOAD_URL="https://github.com/Wenpiner/WProxy/releases/download/$LATEST_VERSION/WProxy-$LATEST_VERSION-linux-$ARCH.tar.gz"
-wget -q $DOWNLOAD_URL -O /tmp/WProxy.tar.gz
+wget --progress=bar:force:noscroll $DOWNLOAD_URL -O /tmp/WProxy.tar.gz 2>&1 | grep --line-buffered -oP "(\d+)(?=%)"|while read -r progress; do printf "\rProgress: [%-50s] %d%%" "$(printf '#%.0s' $(seq 1 $((progress/2))))" "$progress"; done
+printf "\n"
 
 if [ $? -ne 0 ]; then
     echo -e "${RED}Download failed${NC}"
