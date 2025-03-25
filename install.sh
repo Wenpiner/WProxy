@@ -64,7 +64,7 @@ echo "System Info:"
 echo "- OS: $OS"
 echo "- Architecture: $ARCH"
 
-DOWNLOAD_URL="https://github.com/Wenpiner/WProxy/releases/download/$LATEST_VERSION/WProxy_${OS}_${ARCH}.tar.gz"
+DOWNLOAD_URL="https://github.com/Wenpiner/WProxy/releases/download/$LATEST_VERSION/WProxy-${LATEST_VERSION}-${OS}-${ARCH}.tar.gz"
 echo "Download URL: $DOWNLOAD_URL"
 
 # 使用 curl 替代 wget，提供更好的错误处理
