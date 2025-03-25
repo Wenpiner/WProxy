@@ -112,9 +112,6 @@ func handlerConn(tcp *net.TCPConn, userinfo *url.Userinfo) {
 	buf := [3]byte{}
 	_, err := conn.Read(buf[:])
 	if err != nil {
-		return
-	}
-	if err != nil {
 		log.Printf("Connection to %v failed to detect proxy protocol type: %v\n", tcp.RemoteAddr().String(), err)
 		return
 	}

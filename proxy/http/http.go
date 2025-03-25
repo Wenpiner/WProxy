@@ -53,14 +53,10 @@ func (httpConn *HttpConn) Handshake() error {
 	var buf bytes.Buffer
 	err = req.Write(&buf)
 	if err != nil {
-		fmt.Println("Error:", err)
-		return err
-	}
-
-	if err != nil {
 		log.Println("Not a valid HTTP request")
 		return err
 	}
+
 	// Parse hostname
 	host := req.URL.Hostname()
 	port := req.URL.Port()
@@ -93,23 +89,6 @@ func (httpConn *HttpConn) Handshake() error {
 	go io.Copy(httpConn.Conn, dial)
 	io.Copy(dial, httpConn.Conn)
 	return nil
-}
-
-func parseHostAndPort(hostPort string) (string, string, error) {
-	parsedURL, err := url.Parse("//" + hostPort)
-	if err != nil {
-		return "", "", err
-	}
-
-	// Get domain and port using Hostname() and Port()
-	host := parsedURL.Hostname()
-	port := parsedURL.Port()
-
-	if port == "" {
-		port = "80"
-	}
-
-	return host, port, nil
 }
 
 // parseBasicAuth parses an HTTP Basic Authentication string.
