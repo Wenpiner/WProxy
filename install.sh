@@ -28,7 +28,7 @@ esac
 
 # Create installation directory
 INSTALL_DIR="/usr/local/bin"
-CONFIG_DIR="/etc/wproxy"
+CONFIG_DIR="/etc/WProxy"
 
 echo -e "${GREEN}Starting WProxy installation...${NC}"
 
@@ -45,8 +45,8 @@ if [ -z "$LATEST_VERSION" ]; then
 fi
 
 echo "Downloading WProxy $LATEST_VERSION..."
-DOWNLOAD_URL="https://github.com/Wenpiner/WProxy/releases/download/$LATEST_VERSION/wproxy_linux_$ARCH.tar.gz"
-wget -q $DOWNLOAD_URL -O /tmp/wproxy.tar.gz
+DOWNLOAD_URL="https://github.com/Wenpiner/WProxy/releases/download/$LATEST_VERSION/WProxy-$LATEST_VERSION-linux-$ARCH.tar.gz"
+wget -q $DOWNLOAD_URL -O /tmp/WProxy.tar.gz
 
 if [ $? -ne 0 ]; then
     echo -e "${RED}Download failed${NC}"
@@ -55,12 +55,12 @@ fi
 
 # Extract files
 echo "Extracting files..."
-tar -xzf /tmp/wproxy.tar.gz -C /tmp
+tar -xzf /tmp/WProxy.tar.gz -C /tmp
 
 # Move binary to system directory
 echo "Installing..."
-mv /tmp/wproxy $INSTALL_DIR/
-chmod +x $INSTALL_DIR/wproxy
+mv /tmp/WProxy $INSTALL_DIR/
+chmod +x $INSTALL_DIR/WProxy
 
 # Generate random password
 RANDOM_PASSWORD=$(openssl rand -base64 12 | tr -d '/+=' | head -c 16)
@@ -73,14 +73,14 @@ password: "${RANDOM_PASSWORD}"
 EOF
 
 # Create system service
-cat > /etc/systemd/system/wproxy.service << EOF
+cat > /etc/systemd/system/WProxy.service << EOF
 [Unit]
 Description=WProxy Service
 After=network.target
 
 [Service]
 Type=simple
-ExecStart=$INSTALL_DIR/wproxy -c $CONFIG_DIR/config.yaml
+ExecStart=$INSTALL_DIR/WProxy -c $CONFIG_DIR/config.yaml
 Restart=always
 RestartSec=3
 
@@ -93,16 +93,16 @@ systemctl daemon-reload
 
 # Start service
 echo "Starting service..."
-systemctl enable wproxy
-systemctl start wproxy
+systemctl enable WProxy
+systemctl start WProxy
 
 # Clean up temporary files
-rm -f /tmp/wproxy.tar.gz
+rm -f /tmp/WProxy.tar.gz
 
 echo -e "${GREEN}Installation completed!${NC}"
-echo -e "WProxy installed at: $INSTALL_DIR/wproxy"
+echo -e "WProxy installed at: $INSTALL_DIR/WProxy"
 echo -e "Config file location: $CONFIG_DIR/config.yaml"
 echo -e "Default username: admin"
 echo -e "Randomly generated password: ${RANDOM_PASSWORD}"
 echo -e "Please keep your password safe!"
-echo -e "Use the following command to check service status: systemctl status wproxy" 
+echo -e "Use the following command to check service status: systemctl status WProxy" 

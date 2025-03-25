@@ -15,25 +15,25 @@ echo -e "${GREEN}Starting WProxy uninstallation...${NC}"
 
 # Stop service
 echo "Stopping service..."
-systemctl stop wproxy
+systemctl stop WProxy
 
 # Disable service
 echo "Disabling service..."
-systemctl disable wproxy
+systemctl disable WProxy
 
 # Remove service file
 echo "Removing service file..."
-rm -f /etc/systemd/system/wproxy.service
+rm -f /etc/systemd/system/WProxy.service
 
 # Reload systemd
 systemctl daemon-reload
 
 # Remove binary file
 echo "Removing program files..."
-rm -f /usr/local/bin/wproxy
+rm -f /usr/local/bin/WProxy
 
 # Remove config files
 echo "Removing configuration files..."
-rm -rf /etc/wproxy
+rm -rf /etc/WProxy
 
 echo -e "${GREEN}Uninstallation completed!${NC}" 
