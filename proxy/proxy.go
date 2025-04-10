@@ -4,6 +4,8 @@ import (
 	"WProxy/common"
 	"WProxy/proxy/http"
 	"WProxy/proxy/socks"
+	"crypto/tls"
+	"crypto/x509"
 	"flag"
 	"fmt"
 	"log"
@@ -16,9 +18,13 @@ import (
 )
 
 type Config struct {
-	ListenAddr string `yaml:"listen_addr"`
-	Username   string `yaml:"username"`
-	Password   string `yaml:"password"`
+	ListenAddr  string `yaml:"listen_addr"`
+	Username    string `yaml:"username"`
+	Password    string `yaml:"password"`
+	Certificate struct {
+		Key  string `yaml:"key"`
+		Cert string `yaml:"cert"`
+	} `yaml:"certificate"`
 }
 
 func main() {
@@ -26,6 +32,8 @@ func main() {
 	port := flag.Int("port", 1080, "port")
 	username := flag.String("username", "", "username")
 	password := flag.String("password", "", "password")
+	certficateKey := flag.String("certificate-key", "", "certificate_key")
+	certficateCert := flag.String("certificate-cert", "", "certificate_cert")
 	configFile := flag.String("c", "", "config file path")
 	flag.Parse()
 
@@ -60,6 +68,8 @@ func main() {
 		config.ListenAddr = fmt.Sprintf("%s:%d", *host, *port)
 		config.Username = *username
 		config.Password = *password
+		config.Certificate.Key = *certficateKey
+		config.Certificate.Cert = *certficateCert
 	}
 
 	// Parse listen address
@@ -90,12 +100,32 @@ func main() {
 	} else {
 		fmt.Println("TCP proxy started successfully without credentials")
 	}
+	fmt.Println("Listening on", config.ListenAddr, " Port:", portNum, " User:", urlinfo.Username())
 
-	handlerTcp(*listen, urlinfo)
-	// TODO: Implement UDP proxy
+	// load cert key
+	var cert tls.Certificate
+	if config.Certificate.Key != "" && config.Certificate.Cert != "" {
+		cert, err = tls.LoadX509KeyPair(config.Certificate.Cert, config.Certificate.Key)
+		if err != nil {
+			log.Fatalln("Failed to load certificate:", err)
+			return
+		}
+		log.Println("Certificate loaded successfully")
+		cert.Leaf, err = x509.ParseCertificate(cert.Certificate[0])
+		if err != nil {
+			log.Fatalln("Failed to parse certificate:", err)
+			return
+		}
+
+		log.Printf("Certificate Info: Subject: %s, Issuer: %s, NotBefore: %s, NotAfter: %s",
+			cert.Leaf.Subject, cert.Leaf.Issuer, cert.Leaf.NotBefore, cert.Leaf.NotAfter)
+
+	}
+
+	handlerTcp(*listen, urlinfo, &cert)
 }
 
-func handlerConn(tcp *net.TCPConn, userinfo *url.Userinfo) {
+func handlerConn(tcp *net.TCPConn, userinfo *url.Userinfo, cert *tls.Certificate) {
 	defer func(tcp *net.TCPConn) {
 		err := tcp.Close()
 		if err != nil {
@@ -131,7 +161,9 @@ func handlerConn(tcp *net.TCPConn, userinfo *url.Userinfo) {
 			Conn:     &conn,
 			UserInfo: userinfo,
 		}
-		err = h.Handshake()
+
+		tlsResult := buf[0] == 0x16
+		err = h.Handshake(tlsResult, cert)
 		if err != nil {
 			log.Printf("HTTP handshake error: %v\n", err)
 			return
@@ -139,13 +171,13 @@ func handlerConn(tcp *net.TCPConn, userinfo *url.Userinfo) {
 	}
 }
 
-func handlerTcp(listener net.TCPListener, userinfo *url.Userinfo) {
+func handlerTcp(listener net.TCPListener, userinfo *url.Userinfo, cert *tls.Certificate) {
 	for {
 		tcp, err := listener.AcceptTCP()
 		if err != nil {
 			fmt.Println("Error accepting TCP connection:", err)
 			continue
 		}
-		go handlerConn(tcp, userinfo)
+		go handlerConn(tcp, userinfo, cert)
 	}
 }

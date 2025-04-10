@@ -79,6 +79,14 @@ func (buf *BufConn) Read(b []byte) (int, error) {
 	}
 }
 
+// CloseWrite
+func (buf *BufConn) CloseWrite() error {
+	if v, ok := buf.Conn.(*net.TCPConn); ok {
+		return v.CloseWrite()
+	}
+	return nil
+}
+
 func (buf *BufConn) Start() {
 	buf.mu.Lock()
 	defer buf.mu.Unlock()
