@@ -9,7 +9,8 @@ WProxy 是一个带鉴权的 SOCKS5 和 HTTP 代理工具，支持端口复用�
 - [x] 支持身份验证，可以防止未经授权的访问
 - [x] 支持端口复用，可以复用同一个端口提供多种代理服务
 - [x] 轻量级和跨平台，可在 Windows、Linux 和 macOS 上运行
-- [x] 支持 SOCKS5 和 HTTP 代理协议
+- [x] 支持 SOCKS5 和 HTTP/HTTPS 代理协议
+- [x] 支持通过 HTTP/HTTPS 请求头指定目标域名或 IP 进行转发
 
 # 快速安装
 
@@ -30,7 +31,7 @@ curl -s https://raw.githubusercontent.com/Wenpiner/WProxy/main/install.sh | sudo
 
 安装完成后，您可以通过以下命令查看服务状态：
 ```bash
-systemctl status WProxy
+systemctl status wproxy
 ```
 
 ## 卸载
@@ -53,11 +54,11 @@ curl -s https://raw.githubusercontent.com/Wenpiner/WProxy/main/uninstall.sh | su
 
 1. 从 GitHub 仓库下载最新版本的 WProxy 二进制文件
 2. 将下载的文件解压缩到您的系统中
-3. 在命令行中运行 `./WProxy` 命令启动代理服务器
+3. 在命令行中运行 `./wproxy` 命令启动代理服务器
 
 # 配置
 
-配置文件位于 `/etc/WProxy/config.yaml`，您可以根据需要进行以下设置：
+配置文件位于 `/etc/wproxy/config.yaml`，您可以根据需要进行以下设置：
 
 - listen_addr: 代理服务器的监听地址，默认为 0.0.0.0:1080
 - username 和 password: 身份验证所需的用户名和密码
@@ -79,6 +80,43 @@ password: "16位随机密码"  # 安装时自动生成
 - 将您的应用程序或浏览器配置为使用 WProxy 作为代理服务器
 - 输入代理服务器的地址和端口，以及身份验证所需的用户名和密码（如果已启用）
 - 开始通过代理服务器访问互联网
+- 如果需要通过 HTTP/HTTPS 请求头指定目标域名或 IP 进行转发，请在请求头中添加 `X-Proxy-Host`、`X-Proxy-Scheme` 和 `X-Proxy-Secret` 字段。例如：
+  ### 无鉴权、HTTP 转发
+  ```http
+  GET /xxx/xxx HTTP/1.1
+  Host: example.com
+  X-Proxy-Host: target-domain.com
+  X-Proxy-Scheme: http
+  ```
+  ### 无鉴权、HTTP 转发、自定义端口(非TLS)
+  ```http
+  GET /xxx/xxx HTTP/1.1
+  Host: example.com
+  X-Proxy-Host: target-domain.com:8080
+  X-Proxy-Scheme: http
+  ```
+
+  ### 无鉴权、HTTPS 转发、自定义端口(TLS)
+  ```http
+  GET /xxx/xxx HTTP/1.1
+  Host: example.com
+  X-Proxy-Host: target-domain.com:8443
+  X-Proxy-Scheme: https
+  ```
+
+  ### 鉴权、HTTPS 转发 
+  ```http
+  GET /xxx/xxx HTTP/1.1
+  Host: example.com
+  X-Proxy-Host: target-domain.com:8443
+  X-Proxy-Scheme: https
+  X-Proxy-Secret: your_password
+  ```
+
+
+  代理服务器会根据这些字段将请求转发到指定的目标地址和端口。
+### ⚠️ 注意事项
+1. `X-Proxy-Secret`对应就是配置文件中的`password`，如果没有设置密码，则不需要设置该字段。
 
 # 服务管理
 
@@ -86,22 +124,22 @@ password: "16位随机密码"  # 安装时自动生成
 
 ```bash
 # 启动服务
-sudo systemctl start WProxy
+sudo systemctl start wproxy
 
 # 停止服务
-sudo systemctl stop WProxy
+sudo systemctl stop wproxy
 
 # 重启服务
-sudo systemctl restart WProxy
+sudo systemctl restart wproxy
 
 # 查看服务状态
-sudo systemctl status WProxy
+sudo systemctl status wproxy
 
 # 设置开机自启
-sudo systemctl enable WProxy
+sudo systemctl enable wproxy
 
 # 禁用开机自启
-sudo systemctl disable WProxy
+sudo systemctl disable wproxy
 ```
 
 # 贡献
@@ -115,3 +153,4 @@ WProxy 基于 MIT 许可证发布，您可以自由使用、修改和分发本�
 ## Star 历史
 
 [![Star History Chart](https://api.star-history.com/svg?repos=Wenpiner/WProxy&type=Date)](https://star-history.com/#Wenpiner/WProxy&Date) 
+`

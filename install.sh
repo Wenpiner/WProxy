@@ -28,7 +28,7 @@ esac
 
 # Create installation directory
 INSTALL_DIR="/usr/local/bin"
-CONFIG_DIR="/etc/WProxy"
+CONFIG_DIR="/etc/wproxy"
 
 echo -e "${GREEN}Starting WProxy installation...${NC}"
 
@@ -90,15 +90,15 @@ if [ $? -ne 0 ]; then
 fi
 
 # 验证解压后的文件是否存在
-if [ ! -f /tmp/WProxy ]; then
+if [ ! -f /tmp/wproxy ]; then
     echo -e "${RED}Extracted binary not found${NC}"
     exit 1
 fi
 
 # Move binary to system directory
 echo "Installing..."
-mv /tmp/WProxy $INSTALL_DIR/
-chmod +x $INSTALL_DIR/WProxy
+mv /tmp/wproxy $INSTALL_DIR/
+chmod +x $INSTALL_DIR/wproxy
 
 # Generate random password
 RANDOM_PASSWORD=$(openssl rand -base64 12 | tr -d '/+=' | head -c 16)
@@ -111,14 +111,14 @@ password: "${RANDOM_PASSWORD}"
 EOF
 
 # Create system service
-cat > /etc/systemd/system/WProxy.service << EOF
+cat > /etc/systemd/system/wproxy.service << EOF
 [Unit]
 Description=WProxy Service
 After=network.target
 
 [Service]
 Type=simple
-ExecStart=$INSTALL_DIR/WProxy -c $CONFIG_DIR/config.yaml
+ExecStart=$INSTALL_DIR/wproxy -c $CONFIG_DIR/config.yaml
 Restart=always
 RestartSec=3
 
@@ -131,14 +131,14 @@ systemctl daemon-reload
 
 # Start service
 echo "Starting service..."
-systemctl enable WProxy
-systemctl start WProxy
+systemctl enable wproxy
+systemctl start wproxy
 
 # Clean up temporary files
 rm -f /tmp/WProxy.tar.gz
 
 echo -e "${GREEN}Installation completed!${NC}"
-echo -e "WProxy installed at: $INSTALL_DIR/WProxy"
+echo -e "WProxy installed at: $INSTALL_DIR/wproxy"
 echo -e "Config file location: $CONFIG_DIR/config.yaml"
 echo -e "Default username: admin"
 echo -e "Randomly generated password: ${RANDOM_PASSWORD}"

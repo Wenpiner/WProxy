@@ -6,7 +6,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"log"
 	"net"
 	"net/url"
 )
@@ -24,7 +23,7 @@ type TargetAddr struct {
 	Type    byte   // Type
 }
 
-type SocksRequest struct {
+type Request struct {
 	Version byte   // Version
 	Name    string // Domain name
 	IP      net.IP // IP address
@@ -159,7 +158,6 @@ func (s *Socks) selectAuthMethod() error {
 			}
 		}
 	} else {
-		log.Println("No authentication")
 		// Select no authentication method
 		_, err = s.Conn.Write([]byte{0x05, 0x00})
 		if err != nil {

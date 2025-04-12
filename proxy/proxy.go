@@ -32,8 +32,8 @@ func main() {
 	port := flag.Int("port", 1080, "port")
 	username := flag.String("username", "", "username")
 	password := flag.String("password", "", "password")
-	certficateKey := flag.String("certificate-key", "", "certificate_key")
-	certficateCert := flag.String("certificate-cert", "", "certificate_cert")
+	certificateKey := flag.String("certificate-key", "", "certificate_key")
+	certificateCert := flag.String("certificate-cert", "", "certificate_cert")
 	configFile := flag.String("c", "", "config file path")
 	flag.Parse()
 
@@ -68,8 +68,8 @@ func main() {
 		config.ListenAddr = fmt.Sprintf("%s:%d", *host, *port)
 		config.Username = *username
 		config.Password = *password
-		config.Certificate.Key = *certficateKey
-		config.Certificate.Cert = *certficateCert
+		config.Certificate.Key = *certificateKey
+		config.Certificate.Cert = *certificateCert
 	}
 
 	// Parse listen address
@@ -117,7 +117,7 @@ func main() {
 			return
 		}
 
-		log.Printf("Certificate Info: Subject: %s, Issuer: %s, NotBefore: %s, NotAfter: %s",
+		log.Printf("Certificate Info: Subject: %s, Issuer: %s, NotBefore: %s, NotAfter: %s \n",
 			cert.Leaf.Subject, cert.Leaf.Issuer, cert.Leaf.NotBefore, cert.Leaf.NotAfter)
 
 	}
@@ -157,13 +157,10 @@ func handlerConn(tcp *net.TCPConn, userinfo *url.Userinfo, cert *tls.Certificate
 			return
 		}
 	} else {
-		h := http.HttpConn{
-			Conn:     &conn,
-			UserInfo: userinfo,
-		}
 
 		tlsResult := buf[0] == 0x16
-		err = h.Handshake(tlsResult, cert)
+
+		err := http.HandleConn(&conn, userinfo, cert, tlsResult)
 		if err != nil {
 			log.Printf("HTTP handshake error: %v\n", err)
 			return
@@ -178,6 +175,7 @@ func handlerTcp(listener net.TCPListener, userinfo *url.Userinfo, cert *tls.Cert
 			fmt.Println("Error accepting TCP connection:", err)
 			continue
 		}
+		log.Println("Accepted TCP connection from ", tcp.RemoteAddr().String())
 		go handlerConn(tcp, userinfo, cert)
 	}
 }

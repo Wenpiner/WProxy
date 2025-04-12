@@ -6,6 +6,10 @@ import (
 	"time"
 )
 
+type CloseWriter interface {
+	CloseWrite() error
+}
+
 type BufConn struct {
 	Conn         net.Conn
 	buf          []byte
@@ -79,9 +83,8 @@ func (buf *BufConn) Read(b []byte) (int, error) {
 	}
 }
 
-// CloseWrite
 func (buf *BufConn) CloseWrite() error {
-	if v, ok := buf.Conn.(*net.TCPConn); ok {
+	if v, ok := buf.Conn.(CloseWriter); ok {
 		return v.CloseWrite()
 	}
 	return nil
