@@ -91,7 +91,7 @@ func HandleConn(client net.Conn, userinfo *url.Userinfo, cert *tls.Certificate, 
 // handleConnect processes CONNECT requests
 func (httpConn *Conn) handleConnect(req *http.Request) error {
 
-	err := forward.HandleForward(req, httpConn.UserInfo)
+	err := forward.HandleForward(req)
 	if err != nil {
 		return err
 	}
@@ -120,7 +120,7 @@ func (httpConn *Conn) handleConnect(req *http.Request) error {
 // handleHTTPRequest processes regular HTTP requests
 func (httpConn *Conn) handleHTTPRequest(req *http.Request) error {
 
-	err := forward.HandleForward(req, httpConn.UserInfo)
+	err := forward.HandleForward(req)
 	if err != nil {
 		return err
 	}

@@ -1,27 +1,13 @@
 package forward
 
 import (
-	"errors"
 	"net/http"
-	"net/url"
 	"strings"
 )
 
-var ErrAuthFailed = errors.New("authentication failed: incorrect username")
-
-func HandleForward(req *http.Request, userinfo *url.Userinfo) error {
-	password := ""
-	if userinfo != nil {
-		password, _ = userinfo.Password()
-	}
+func HandleForward(req *http.Request) error {
 	xProxyHost := req.Header.Get("x-proxy-host")
 	if xProxyHost != "" {
-		if password != "" {
-			xProxySecret := req.Header.Get("x-proxy-secret")
-			if xProxySecret != password {
-				return ErrAuthFailed
-			}
-		}
 
 		newScheme := "https"
 		headerScheme := req.Header.Get("x-proxy-scheme")
