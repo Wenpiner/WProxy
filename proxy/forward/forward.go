@@ -1,11 +1,23 @@
 package forward
 
 import (
+	"errors"
 	"net/http"
 	"strings"
 )
 
+var LoopDetected = errors.New("loop detected: proxy loop")
+
 func HandleForward(req *http.Request) error {
+	// loop check
+	loop := req.Header.Get("x-proxy-loop")
+	if loop != "" {
+		return LoopDetected
+	}
+
+	// write loop check
+	req.Header.Set("x-proxy-loop", "1")
+
 	xProxyHost := req.Header.Get("x-proxy-host")
 	if xProxyHost != "" {
 
@@ -24,6 +36,7 @@ func HandleForward(req *http.Request) error {
 		req.Host = handleHost(req.URL.Scheme, req.Host)
 		req.URL.Host = req.Host
 	}
+
 	return nil
 }
 

@@ -59,6 +59,14 @@ func HandleConn(client net.Conn, userinfo *url.Userinfo, cert *tls.Certificate, 
 	if httpConn.UserInfo != nil {
 		authHeader := req.Header.Get("Proxy-Authorization")
 		if authHeader == "" {
+			username, password, ok := req.BasicAuth()
+			if ok {
+				authHeader = "Basic " + base64.StdEncoding.EncodeToString([]byte(username+":"+password))
+			} else {
+				authHeader = ""
+			}
+		}
+		if authHeader == "" {
 			// Return 407 requesting authentication
 			resp := "HTTP/1.1 407 Proxy Authentication Required\r\n" +
 				"Proxy-Authenticate: Basic realm=\"Proxy\"\r\n" +
