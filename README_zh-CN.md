@@ -110,13 +110,13 @@ password: "16位随机密码"  # 安装时自动生成
   Host: example.com
   X-Proxy-Host: target-domain.com:8443
   X-Proxy-Scheme: https
-  X-Proxy-Secret: your_password
+  Proxy-Authorization: your_password
   ```
 
 
   代理服务器会根据这些字段将请求转发到指定的目标地址和端口。
 ### ⚠️ 注意事项
-1. `X-Proxy-Secret`对应就是配置文件中的`password`，如果没有设置密码，则不需要设置该字段。
+1. `Proxy-Authorization`对应就是`BasicAuth`认证方式，如果没有设置密码，则不需要设置该字段。
 
 # 服务管理
 

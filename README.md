@@ -117,7 +117,7 @@ Notes:
   The proxy server will forward the request to the specified target address and port based on these fields.
 
 ### ⚠️ Notes
-1. `X-Proxy-Secret` corresponds to the `password` in the configuration file. If no password is set, this field is not required.
+1. `Proxy-Authorization` corresponds to the `BasicAuth` authentication method. If no password is set, this field is not required.
 
 # Service Management
 
